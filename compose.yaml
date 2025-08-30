@@ -1,0 +1,7 @@
+﻿services:
+  anonymousstudentreviews:
+    image: anonymousstudentreviews
+    build:
+      context: .
+      dockerfile: AnonymousStudentReviews/Dockerfile
+
