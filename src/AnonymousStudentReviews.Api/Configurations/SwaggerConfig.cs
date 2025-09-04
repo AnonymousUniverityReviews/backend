@@ -23,7 +23,7 @@ public static class SwaggerConfig
             // document.OperationProcessors.Add(
             //     new AspNetCoreOperationSecurityScopeProcessor("Bearer"));
         });
-        
+
         return services;
     }
 }
