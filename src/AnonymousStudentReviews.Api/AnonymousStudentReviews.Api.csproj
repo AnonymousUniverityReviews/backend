@@ -21,8 +21,4 @@
         <ProjectReference Include="..\AnonymousStudentReviews.Infrastructure\AnonymousStudentReviews.Infrastructure.csproj"/>
     </ItemGroup>
 
-    <ItemGroup>
-        <Folder Include="Extensions\"/>
-    </ItemGroup>
-
 </Project>

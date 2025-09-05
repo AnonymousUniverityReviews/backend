@@ -1,3 +1,4 @@
+using AnonymousStudentReviews.Core.Abstractions;
 using AnonymousStudentReviews.Infrastructure.Data;
 
 using Microsoft.EntityFrameworkCore;
@@ -29,6 +30,7 @@ public static class InfrastructureServiceExtensions
         }
 
         RegisterEFRepositories(services);
+        RegisterServices(services);
 
         logger.LogInformation("{Project} services registered", "Infrastructure");
 
@@ -61,5 +63,10 @@ public static class InfrastructureServiceExtensions
 
     private static void RegisterEFRepositories(IServiceCollection services)
     {
+    }
+
+    private static void RegisterServices(IServiceCollection services)
+    {
+        services.AddScoped<IUnitOfWork, UnitOfWork>();
     }
 }
