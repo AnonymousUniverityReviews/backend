@@ -6,7 +6,7 @@ using Serilog.Extensions.Logging;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
-var logger = new LoggerConfiguration()
+Logger logger = new LoggerConfiguration()
     .WriteTo.Console()
     .CreateLogger();
 
@@ -14,7 +14,7 @@ logger.Information("Starting web host");
 
 builder.AddLoggerConfigs();
 
-var appLogger = new SerilogLoggerFactory(logger)
+ILogger<Program> appLogger = new SerilogLoggerFactory(logger)
     .CreateLogger<Program>();
 
 builder.Services.AddControllers();
@@ -25,11 +25,13 @@ builder.Services.AddServiceConfigs(appLogger, builder);
 
 WebApplication app = builder.Build();
 
+
+if (app.Environment.IsDevelopment() && MigrationConfig.ShouldApplyMigrationsOnStartup(app.Configuration, appLogger))
+{
+    app.UseMigrations(appLogger);
+}
+
 app.UseAppMiddleware();
-
-app.UseAuthorization();
-
-app.MapControllers();
 
 app.Run();
 

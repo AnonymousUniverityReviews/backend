@@ -13,6 +13,10 @@ public static class MiddlewareConfig
             app.MapGet("/", () => Results.Redirect("/swagger"));
         }
 
+        app.UseAuthorization();
+
+        app.MapControllers();
+
         return app;
     }
 }

@@ -11,7 +11,7 @@ public static class ServiceConfig
         services
             .AddInfrastructureServices(builder.Configuration, logger, builder.Environment.EnvironmentName);
 
-        logger.LogInformation("{Project} services registered", "Core and Infrastructure services registered");
+        logger.LogInformation("Infrastructure services registered");
 
         return services;
     }
