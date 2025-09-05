@@ -21,6 +21,8 @@ builder.Services.AddControllers();
 
 builder.Services.AddSwaggerConfig();
 
+builder.Services.AddServiceConfigs(appLogger, builder);
+
 WebApplication app = builder.Build();
 
 app.UseAppMiddleware();
