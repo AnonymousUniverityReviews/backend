@@ -21,6 +21,7 @@
 
     <ItemGroup>
         <ProjectReference Include="..\AnonymousStudentReviews.Infrastructure\AnonymousStudentReviews.Infrastructure.csproj"/>
+        <ProjectReference Include="..\AnonymousStudentReviews.UseCases\AnonymousStudentReviews.UseCases.csproj" />
     </ItemGroup>
 
 </Project>
