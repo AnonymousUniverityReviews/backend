@@ -1,4 +1,7 @@
+using AnonymousStudentReviews.Api.Dummy.Create;
 using AnonymousStudentReviews.Infrastructure;
+
+using FluentValidation;
 
 namespace AnonymousStudentReviews.Api.Configurations;
 
@@ -9,7 +12,9 @@ public static class ServiceConfig
         WebApplicationBuilder builder)
     {
         services
-            .AddInfrastructureServices(builder.Configuration, logger, builder.Environment.EnvironmentName);
+            .AddProblemDetails()
+            .AddInfrastructureServices(builder.Configuration, logger, builder.Environment.EnvironmentName)
+            .AddValidatorsFromAssemblyContaining<CreateDummyRequestValidator>();
 
         logger.LogInformation("Infrastructure services registered");
 
