@@ -1,3 +1,5 @@
+using AnonymousStudentReviews.UseCases.Dummies.Create;
+
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -26,9 +28,9 @@ public static class UseCasesServiceExtensions
         }
 
         RegisterServices(services);
-        
+
         logger.LogInformation("{Project} services registered", "UseCases");
-        
+
         return services;
     }
 
@@ -46,5 +48,6 @@ public static class UseCasesServiceExtensions
 
     private static void RegisterServices(IServiceCollection services)
     {
+        services.AddScoped<ICreateDummyService, CreateDummyService>();
     }
 }

@@ -1,4 +1,4 @@
-using AnonymousStudentReviews.Api.Dummy.Create;
+using AnonymousStudentReviews.Api.Dummies.Create;
 using AnonymousStudentReviews.Infrastructure;
 using AnonymousStudentReviews.UseCases;
 

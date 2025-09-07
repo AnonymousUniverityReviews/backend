@@ -1,3 +1,6 @@
+using AnonymousStudentReviews.Core.DummyAggregate;
+using AnonymousStudentReviews.Infrastructure.Data.Configurations;
+
 using Microsoft.EntityFrameworkCore;
 
 namespace AnonymousStudentReviews.Infrastructure.Data;
@@ -10,5 +13,12 @@ public class ApplicationDbContext : DbContext
 
     public ApplicationDbContext(DbContextOptions options) : base(options)
     {
+    }
+    
+    public DbSet<Dummy> Dummies { get; set; }
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        modelBuilder.ApplyConfigurationsFromAssembly(typeof(DummyConfiguration).Assembly);
     }
 }
