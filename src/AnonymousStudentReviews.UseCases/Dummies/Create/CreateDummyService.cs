@@ -19,14 +19,19 @@ public class CreateDummyService : ICreateDummyService
         var badCondition = false;
         if (badCondition)
         {
-            return Result.Failure<Dummy>(CreateDummyErrors.SomeError);
+            return Result.Failure<Dummy>(CreateDummyErrors.SomeBadRequestError);
         }
 
-        var dummy = Dummy.Create("").Value;
+        var createDummyResult = Dummy.Create(dto.Name);
 
-        _dummyRepository.Create(dummy);
+        if (createDummyResult.IsFailure)
+        {
+            return createDummyResult;
+        }
+
+        _dummyRepository.Create(createDummyResult.Value);
         await _unitOfWork.SaveChangesAsync();
 
-        return Result.Success(dummy);
+        return Result.Success(createDummyResult.Value);
     }
 }

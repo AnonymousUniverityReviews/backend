@@ -1,6 +1,6 @@
 using FluentValidation;
 
-namespace AnonymousStudentReviews.Api.Dummies.Create;
+namespace AnonymousStudentReviews.Api.Features.Dummies.Create;
 
 public class CreateDummyRequestValidator : AbstractValidator<CreateDummyRequest>
 {

@@ -21,7 +21,11 @@
 
     <ItemGroup>
         <ProjectReference Include="..\AnonymousStudentReviews.Infrastructure\AnonymousStudentReviews.Infrastructure.csproj"/>
-        <ProjectReference Include="..\AnonymousStudentReviews.UseCases\AnonymousStudentReviews.UseCases.csproj" />
+        <ProjectReference Include="..\AnonymousStudentReviews.UseCases\AnonymousStudentReviews.UseCases.csproj"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <Folder Include="Features\"/>
     </ItemGroup>
 
 </Project>
