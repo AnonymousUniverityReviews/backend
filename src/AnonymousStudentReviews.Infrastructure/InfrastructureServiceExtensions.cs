@@ -1,5 +1,7 @@
 using AnonymousStudentReviews.Core.Abstractions;
+using AnonymousStudentReviews.Core.DummyAggregate;
 using AnonymousStudentReviews.Infrastructure.Data;
+using AnonymousStudentReviews.Infrastructure.Dummies;
 
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -39,7 +41,7 @@ public static class InfrastructureServiceExtensions
 
     private static void AddDbContextWithPostgres(IServiceCollection services, IConfiguration configuration)
     {
-        string? connectionString = configuration.GetConnectionString("Postgres");
+        var connectionString = configuration.GetConnectionString("Postgres");
         services.AddDbContext<ApplicationDbContext>(options =>
         {
             options.UseNpgsql(connectionString);
@@ -63,6 +65,7 @@ public static class InfrastructureServiceExtensions
 
     private static void RegisterEFRepositories(IServiceCollection services)
     {
+        services.AddScoped<IDummyRepository, DummyRepository>();
     }
 
     private static void RegisterServices(IServiceCollection services)
