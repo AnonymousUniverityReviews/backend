@@ -13,6 +13,7 @@ public static class ServiceConfig
         WebApplicationBuilder builder)
     {
         services
+            .AddExceptionHandler<GlobalExceptionHandler>()
             .AddProblemDetails()
             .AddInfrastructureServices(builder.Configuration, logger, builder.Environment.EnvironmentName)
             .AddUseCasesServices(builder.Configuration, logger, builder.Environment.EnvironmentName)
