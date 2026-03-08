@@ -5,5 +5,5 @@ namespace AnonymousStudentReviews.UseCases.Universities.RetrieveMany;
 
 public interface IRetrieveManyUniversitiesService
 {
-    Task<Result<OffsetPagedResult<UniversityPreview>>> HandleAsync(RetrieveManyUniversitiesDto dto);
+    Task<Result<CursorPagedResult<UniversityPreview>>> HandleAsync(RetrieveManyUniversitiesDto dto);
 }
