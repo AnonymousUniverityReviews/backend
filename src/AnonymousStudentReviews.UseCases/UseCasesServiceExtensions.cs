@@ -7,6 +7,8 @@ using AnonymousStudentReviews.UseCases.Reviews.Delete;
 using AnonymousStudentReviews.UseCases.Reviews.Edit;
 using AnonymousStudentReviews.UseCases.Reviews.RetrieveMany;
 using AnonymousStudentReviews.UseCases.Reviews.RetrieveOne;
+using AnonymousStudentReviews.UseCases.Universities.AdminRetrieveMany;
+using AnonymousStudentReviews.UseCases.Universities.Create;
 using AnonymousStudentReviews.UseCases.Universities.Delete;
 using AnonymousStudentReviews.UseCases.Universities.RetrieveMany;
 using AnonymousStudentReviews.UseCases.Universities.RetrieveOne;
@@ -65,21 +67,17 @@ public static class UseCasesServiceExtensions
         services.AddScoped<IRegistrationService, RegistrationService>();
         services.AddScoped<IAccountVerificationService, AccountVerificationService>();
         services.AddScoped<ILoginService, LoginService>();
+
         services.AddScoped<ICreateReviewService, CreateReviewService>();
         services.AddScoped<IEditReviewService, EditReviewService>();
         services.AddScoped<IDeleteReviewService, DeleteReviewService>();
-        services.AddScoped<IRetrieveManyUniversitiesService, RetrieveManyUniversitiesService>();
-        services.AddScoped<ICreateReviewService, CreateReviewService>();
-        services.AddScoped<IEditReviewService, EditReviewService>();
-        services.AddScoped<IDeleteReviewService, DeleteReviewService>();
-        services.AddScoped<IRetrieveManyUniversitiesService, RetrieveManyUniversitiesService>();
-        services.AddScoped<ICreateReviewService, CreateReviewService>();
-        services.AddScoped<IEditReviewService, EditReviewService>();
-        services.AddScoped<IDeleteReviewService, DeleteReviewService>();
-        services.AddScoped<IRetrieveManyUniversitiesService, RetrieveManyUniversitiesService>();
-        services.AddScoped<IRetrieveOneUniversityService, RetrieveOneUniversityService>();
         services.AddScoped<IRetrieveManyReviewsService, RetrieveManyReviewsService>();
         services.AddScoped<IRetrieveOneReviewService, RetrieveOneReviewService>();
+
+        services.AddScoped<IRetrieveManyUniversitiesService, RetrieveManyUniversitiesService>();
+        services.AddScoped<IAdminRetrieveManyUniversitiesService, AdminRetrieveManyUniversitiesService>();
+        services.AddScoped<IRetrieveOneUniversityService, RetrieveOneUniversityService>();
+        services.AddScoped<ICreateUniversityService, CreateUniversityService>();
         services.AddScoped<IUpdateUniversityService, UpdateUniversityService>();
         services.AddScoped<IDeleteUniversityService, DeleteUniversityService>();
         services.AddScoped<IUploadUniversityIconService, UploadUniversityIconService>();
