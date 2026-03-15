@@ -1,3 +1,4 @@
+using AnonymousStudentReviews.Infrastructure.OpenId;
 using AnonymousStudentReviews.Infrastructure.Options;
 
 using Microsoft.Extensions.Configuration;
@@ -15,11 +16,11 @@ public class Worker : IHostedService
     private readonly OpenIddictOptions _openIddictOptions;
     private readonly IServiceProvider _serviceProvider;
 
-    public Worker(IServiceProvider serviceProvider, IOptions<OpenIddictOptions> openIddictOptions,
-        IConfiguration configuration)
+    public Worker(IOptions<OpenIddictOptions> openIddictOptions,
+        IConfiguration configuration, IServiceProvider serviceProvider)
     {
-        _serviceProvider = serviceProvider;
         _configuration = configuration;
+        _serviceProvider = serviceProvider;
         _openIddictOptions = openIddictOptions.Value;
     }
 
@@ -28,18 +29,65 @@ public class Worker : IHostedService
         await using var scope = _serviceProvider.CreateAsyncScope();
 
         var openIddictApplicationManager = scope.ServiceProvider.GetRequiredService<IOpenIddictApplicationManager>();
+        var openIddictScopeManager = scope.ServiceProvider.GetRequiredService<IOpenIddictScopeManager>();
 
+        await RegisterScopesAsync(cancellationToken, openIddictScopeManager);
+        await RegisterApplicationsAsync(cancellationToken, openIddictApplicationManager);
+    }
+
+    public Task StopAsync(CancellationToken cancellationToken)
+    {
+        return Task.CompletedTask;
+    }
+
+    private string GetClientSecretByClientId(string clientId)
+    {
+        var secret = _configuration[$"OpenIddictApplicationSecrets:{clientId}"];
+
+        if (secret is null)
+        {
+            throw new Exception($"Secret for application with id {clientId} not set");
+        }
+
+        return secret;
+    }
+
+    private async Task RegisterScopesAsync(CancellationToken cancellationToken, IOpenIddictScopeManager scopeManager)
+    {
+        var universityScopeDescriptor = new OpenIddictScopeDescriptor
+        {
+            Name = CustomOpenIdScopes.UniversityId,
+            DisplayName = "University id"
+        };
+
+        var scopeExists = await scopeManager
+            .FindByNameAsync(universityScopeDescriptor.Name, cancellationToken) is not null;
+
+        if (!scopeExists)
+        {
+            await scopeManager.CreateAsync(universityScopeDescriptor, cancellationToken);
+        }
+    }
+
+    private async Task RegisterApplicationsAsync(CancellationToken cancellationToken,
+        IOpenIddictApplicationManager applicationManager)
+    {
         foreach (var openIddictApplicationOptions in _openIddictOptions.Applications)
         {
             var openIddictApplicationDescriptor = new OpenIddictApplicationDescriptor
             {
                 ApplicationType = openIddictApplicationOptions.ApplicationType.ToOpenIddictApplicationType(),
                 ClientType = openIddictApplicationOptions.ClientType.ToOpenIddictClientType(),
-                ClientSecret = GetClientSecretByClientId(openIddictApplicationOptions.ClientId),
                 ClientId = openIddictApplicationOptions.ClientId,
                 ConsentType = openIddictApplicationOptions.ConsentType.ToOpenIddictConsentType(),
                 DisplayName = openIddictApplicationOptions.DisplayName
             };
+
+            if (openIddictApplicationDescriptor.ClientType == OpenIddictConstants.ClientTypes.Confidential)
+            {
+                openIddictApplicationDescriptor.ClientSecret =
+                    GetClientSecretByClientId(openIddictApplicationOptions.ClientId);
+            }
 
             foreach (var endpointOption in openIddictApplicationOptions.Permissions.Endpoints)
             {
@@ -77,35 +125,19 @@ public class Worker : IHostedService
             }
 
             var clientFromDatabase =
-                await openIddictApplicationManager.FindByClientIdAsync(openIddictApplicationOptions.ClientId,
+                await applicationManager.FindByClientIdAsync(openIddictApplicationOptions.ClientId,
                     cancellationToken);
 
             if (clientFromDatabase is null)
             {
-                await openIddictApplicationManager.CreateAsync(openIddictApplicationDescriptor, cancellationToken);
+                await applicationManager.CreateAsync(openIddictApplicationDescriptor, cancellationToken);
             }
             else
             {
-                await openIddictApplicationManager.UpdateAsync(clientFromDatabase, openIddictApplicationDescriptor,
+                await applicationManager.UpdateAsync(clientFromDatabase, openIddictApplicationDescriptor,
                     cancellationToken);
+                Console.WriteLine($"Updated client with id {openIddictApplicationOptions.ClientId}");
             }
         }
-    }
-
-    public Task StopAsync(CancellationToken cancellationToken)
-    {
-        return Task.CompletedTask;
-    }
-
-    private string GetClientSecretByClientId(string clientId)
-    {
-        var secret = _configuration[$"OpenIddictApplicationSecrets:{clientId}"];
-
-        if (secret is null)
-        {
-            throw new Exception($"Secret for application with id {clientId} not set");
-        }
-
-        return secret;
     }
 }

@@ -141,7 +141,8 @@ public class UniversityRepository : IUniversityRepository
                 Website = u.Website,
                 CreatedAt = u.CreatedAt,
                 AverageScore = u.Reviews.Any() ? u.Reviews.Average(e => e.Score) : 0,
-                ReviewCount = u.Reviews.Any() ? u.Reviews.Count() : 0
+                ReviewCount = u.Reviews.Any() ? u.Reviews.Count() : 0,
+                IconUrl = u.IconUrl
             });
 
         var items = await projectedQuery.Take(limit + 1).ToListAsync();

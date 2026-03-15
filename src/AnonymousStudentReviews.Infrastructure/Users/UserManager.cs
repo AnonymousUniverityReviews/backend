@@ -90,19 +90,19 @@ public class UserManager : IUserManager
         return Result.Success(createdUser);
     }
 
-    public async Task RequestAccountVerificationAsync(User user, string email)
+    public async Task RequestAccountVerificationAsync(User user, string email, string returnUrl)
     {
         var emailVerificationTokenString = _emailVerificationTokenGenerator.Generate();
         var emailVerificationTokenStringHash = _emailVerificationTokenHasher.Hash(emailVerificationTokenString);
 
-        var emailVerificationTokenExpirationHours = _accountConfirmationOptions.EmailVerificationTokenExpirationHours;
+        var emailVerificationTokenExpirationMinutes = _accountConfirmationOptions.EmailVerificationTokenExpirationMinutes;
 
         var emailVerificationToken = new Core.Aggregates.EmailVerificationToken.EmailVerificationToken
         {
             Id = Guid.NewGuid(),
             TokenHash = emailVerificationTokenStringHash,
             ExpiresAt =
-                DateTime.UtcNow.AddHours(emailVerificationTokenExpirationHours),
+                DateTime.UtcNow.AddMinutes(emailVerificationTokenExpirationMinutes),
             CreatedAt = DateTime.UtcNow,
             User = user
         };
@@ -110,7 +110,7 @@ public class UserManager : IUserManager
         _emailVerificationTokenRepository.Create(emailVerificationToken);
         await _unitOfWork.SaveChangesAsync();
 
-        var accountVerificationLink = _accountVerificationLinkFactory.Create(emailVerificationTokenString);
+        var accountVerificationLink = _accountVerificationLinkFactory.Create(emailVerificationTokenString, returnUrl);
         await SendAccountVerificationEmailAsync(email, accountVerificationLink);
     }
 

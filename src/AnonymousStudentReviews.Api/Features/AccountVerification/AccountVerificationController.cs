@@ -1,5 +1,4 @@
 using AnonymousStudentReviews.Api.Extensions;
-using AnonymousStudentReviews.Api.Features.Dummies.Create;
 using AnonymousStudentReviews.UseCases.AccountVerification;
 
 using FluentValidation;
@@ -8,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace AnonymousStudentReviews.Api.Features.AccountVerification;
 
-[Route("verify_account")]
+[Route("api/verify_account")]
 public class AccountVerificationController : Controller
 {
     private readonly IValidator<AccountVerificationQueryParameters> _accountVerificationQueryParamsValidator;
@@ -53,6 +52,7 @@ public class AccountVerificationController : Controller
             }
         }
 
+        ViewData["ReturnUrl"] = queryParameters.ReturnUrl;
         return View("Success");
     }
 }

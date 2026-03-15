@@ -1,4 +1,9 @@
+using System.Security.Cryptography.X509Certificates;
+
+using AnonymousStudentReviews.Api.Extensions;
+using AnonymousStudentReviews.Api.Options;
 using AnonymousStudentReviews.Infrastructure.Data;
+using AnonymousStudentReviews.Infrastructure.OpenId;
 
 using OpenIddict.Abstractions;
 
@@ -7,7 +12,7 @@ namespace AnonymousStudentReviews.Api.Configurations;
 public static class OpenIddictConfig
 {
     public static IServiceCollection AddOpenIddictConfig(this IServiceCollection services,
-        WebApplicationBuilder builder)
+        IWebHostEnvironment environment, IConfiguration configuration)
     {
         services.AddOpenIddict()
             .AddCore(options =>
@@ -29,15 +34,39 @@ public static class OpenIddictConfig
                     OpenIddictConstants.Permissions.Scopes.Roles,
                     OpenIddictConstants.Scopes.Profile,
                     OpenIddictConstants.Scopes.Roles,
-                    OpenIddictConstants.Scopes.OfflineAccess
+                    OpenIddictConstants.Scopes.OfflineAccess,
+                    CustomOpenIdScopes.UniversityId
                 );
+
+                options.RegisterPromptValues(OpenIddictConstants.PromptValues.Login,
+                    OpenIddictConstants.PromptValues.Create, OpenIddictConstants.PromptValues.Consent);
 
                 options.AllowAuthorizationCodeFlow().AllowRefreshTokenFlow();
 
-                if (builder.Environment.IsDevelopment())
+                if (environment.IsDevelopment())
                 {
                     options.AddDevelopmentEncryptionCertificate()
                         .AddDevelopmentSigningCertificate();
+                }
+
+                if (!environment.IsDevelopment())
+                {
+                    var openIddictCertificateOptions =
+                        configuration.GetValidated<OpenIddictCertificateOptions>(CorsOptions.SectionName);
+
+                    var encryptionCert =
+                        X509CertificateLoader.LoadPkcs12FromFile(
+                            openIddictCertificateOptions.EncryptionCertificateFileContainerPath,
+                            openIddictCertificateOptions.EncryptionCertificatePassword);
+
+                    options.AddEncryptionCertificate(encryptionCert);
+
+                    var signingCert =
+                        X509CertificateLoader.LoadPkcs12FromFile(
+                            openIddictCertificateOptions.SigningCertificateFileContainerPath,
+                            openIddictCertificateOptions.SigningCertificatePassword);
+
+                    options.AddSigningCertificate(signingCert);
                 }
 
 
@@ -55,7 +84,6 @@ public static class OpenIddictConfig
 
                 options.UseAspNetCore();
             });
-
 
         return services;
     }
