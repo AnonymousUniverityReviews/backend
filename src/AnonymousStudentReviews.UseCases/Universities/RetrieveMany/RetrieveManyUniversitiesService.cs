@@ -15,12 +15,21 @@ public class RetrieveManyUniversitiesService : IRetrieveManyUniversitiesService
 
     public async Task<Result<CursorPagedResult<UniversityPreview>>> HandleAsync(RetrieveManyUniversitiesDto dto)
     {
-        var cursor = CursorUtils.FromCursor<UniversityCursor>(dto.Cursor);
+        UniversityCursor? cursor = null;
 
-        var result =
-            await _universityRepository.GetAllAsync(dto.Query, dto.Name, dto.City, dto.UniversitySortBy,
-                dto.SortOrder, cursor, dto.Limit);
+        if (!string.IsNullOrWhiteSpace(dto.Cursor))
+        {
+            cursor = CursorUtils.FromCursor<UniversityCursor>(dto.Cursor);
+        }
 
+        var result = await _universityRepository.GetAllAsync(
+            dto.Query,
+            dto.Name,
+            dto.City,
+            dto.UniversitySortBy,
+            dto.SortOrder,
+            cursor,
+            dto.Limit);
 
         return Result.Success(result);
     }

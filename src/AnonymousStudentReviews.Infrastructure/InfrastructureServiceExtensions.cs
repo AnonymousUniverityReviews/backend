@@ -110,7 +110,6 @@ public static class InfrastructureServiceExtensions
         });
     }
 
-
     private static void RegisterDevelopmentOnlyDependencies(IServiceCollection services, IConfiguration configuration)
     {
         AddMainDbContextWithPostgres(services, configuration);
@@ -144,6 +143,8 @@ public static class InfrastructureServiceExtensions
             .PersistKeysToDbContext<DataProtectionDatabaseContext>();
 
         services.AddScoped<IUnitOfWork, UnitOfWork>();
+        services.AddScoped<IUniversityIconStorage, UniversityIconStorage>();
+
         services.AddScoped<IEmailHasher, EmailHasher>();
         services.AddScoped<IPasswordHasher, PasswordHasher>();
         services.AddScoped<IEmailVerificationTokenHasher, EmailVerificationTokenHasher>();

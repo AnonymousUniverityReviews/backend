@@ -1,12 +1,12 @@
-using AnonymousStudentReviews.Core.Abstractions;
+﻿using AnonymousStudentReviews.Core.Abstractions;
 using AnonymousStudentReviews.Core.Aggregates.University;
 
-namespace AnonymousStudentReviews.UseCases.Universities.RetrieveMany;
+namespace AnonymousStudentReviews.UseCases.Universities.AdminRetrieveMany;
 
-public class RetrieveManyUniversitiesDto
+public class AdminRetrieveManyUniversitiesDto
 {
     public int Limit { get; set; } = 20;
-    public string? Cursor { get; set; }
+    public int Offset { get; set; } = 0;
 
     public string? Query { get; set; }
     public string? Name { get; set; }

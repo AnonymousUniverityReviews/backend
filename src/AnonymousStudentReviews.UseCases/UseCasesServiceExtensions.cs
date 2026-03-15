@@ -7,8 +7,13 @@ using AnonymousStudentReviews.UseCases.Reviews.Delete;
 using AnonymousStudentReviews.UseCases.Reviews.Edit;
 using AnonymousStudentReviews.UseCases.Reviews.RetrieveMany;
 using AnonymousStudentReviews.UseCases.Reviews.RetrieveOne;
+using AnonymousStudentReviews.UseCases.Universities.AdminRetrieveMany;
+using AnonymousStudentReviews.UseCases.Universities.Create;
+using AnonymousStudentReviews.UseCases.Universities.Delete;
 using AnonymousStudentReviews.UseCases.Universities.RetrieveMany;
 using AnonymousStudentReviews.UseCases.Universities.RetrieveOne;
+using AnonymousStudentReviews.UseCases.Universities.Update;
+using AnonymousStudentReviews.UseCases.Universities.UploadIcon;
 using AnonymousStudentReviews.UseCases.Users.Edit;
 using AnonymousStudentReviews.UseCases.Users.Retrieve.RetrieveMany;
 using AnonymousStudentReviews.UseCases.Users.Retrieve.RetrieveOne;
@@ -81,6 +86,13 @@ public static class UseCasesServiceExtensions
         services.AddScoped<IRetrieveManyReviewsService, RetrieveManyReviewsService>();
         services.AddScoped<IRetrieveOneReviewService, RetrieveOneReviewService>();
 
+        services.AddScoped<IRetrieveManyUniversitiesService, RetrieveManyUniversitiesService>();
+        services.AddScoped<IAdminRetrieveManyUniversitiesService, AdminRetrieveManyUniversitiesService>();
+        services.AddScoped<IRetrieveOneUniversityService, RetrieveOneUniversityService>();
+        services.AddScoped<ICreateUniversityService, CreateUniversityService>();
+        services.AddScoped<IUpdateUniversityService, UpdateUniversityService>();
+        services.AddScoped<IDeleteUniversityService, DeleteUniversityService>();
+        services.AddScoped<IUploadUniversityIconService, UploadUniversityIconService>();
         services.AddScoped<IAssignUserRoleService, AssignUserRoleService>();
         services.AddScoped<IRemoveUserRoleService, RemoveUserRoleService>();
     }

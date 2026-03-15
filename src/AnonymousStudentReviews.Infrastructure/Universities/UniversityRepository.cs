@@ -18,12 +18,16 @@ public class UniversityRepository : IUniversityRepository
         _context = context;
     }
 
-    public async Task<CursorPagedResult<UniversityPreview>> GetAllAsync(string? query, string? name, string? city,
-        UniversitySortBy universitySortBy, SortOrder sortOrder,
-        UniversityCursor? cursor, int limit)
+    public async Task<CursorPagedResult<UniversityPreview>> GetAllAsync(
+        string? query,
+        string? name,
+        string? city,
+        UniversitySortBy universitySortBy,
+        SortOrder sortOrder,
+        UniversityCursor? cursor,
+        int limit)
     {
         var dbQuery = _context.Universities.AsNoTracking();
-
 
         if (!string.IsNullOrWhiteSpace(query))
         {
@@ -35,12 +39,12 @@ public class UniversityRepository : IUniversityRepository
 
         if (!string.IsNullOrWhiteSpace(name))
         {
-            dbQuery = dbQuery.Where(u => u.Name.ToLower().Contains(name.ToLower().Trim()));
+            dbQuery = dbQuery.Where(u => u.Name.ToLower().Contains(name.Trim().ToLower()));
         }
 
         if (!string.IsNullOrWhiteSpace(city))
         {
-            dbQuery = dbQuery.Where(u => u.City != null && u.City.ToLower().Contains(city.ToLower().Trim()));
+            dbQuery = dbQuery.Where(u => u.City != null && u.City.ToLower().Contains(city.Trim().ToLower()));
         }
 
         switch (universitySortBy)
@@ -106,7 +110,7 @@ public class UniversityRepository : IUniversityRepository
                     {
                         dbQuery = dbQuery.Where(u =>
                             (u.Reviews.Any() ? u.Reviews.Count() : 0) < cursorReviewCount ||
-                            ((u.Reviews.Any() ? u.Reviews.Count : 0) == cursorReviewCount &&
+                            ((u.Reviews.Any() ? u.Reviews.Count() : 0) == cursorReviewCount &&
                              u.Id > cursor.Id));
                     }
                     else
@@ -141,7 +145,6 @@ public class UniversityRepository : IUniversityRepository
                 IconUrl = u.IconUrl
             });
 
-
         var items = await projectedQuery.Take(limit + 1).ToListAsync();
 
         var hasNextPage = items.Count > limit;
@@ -167,6 +170,88 @@ public class UniversityRepository : IUniversityRepository
         return new CursorPagedResult<UniversityPreview>(items, encodedNextCursor, hasNextPage);
     }
 
+    public async Task<OffsetPagedResult<UniversityPreview>> GetAllOffsetAsync(
+        string? query,
+        string? name,
+        string? city,
+        UniversitySortBy universitySortBy,
+        SortOrder sortOrder,
+        int offset,
+        int limit)
+    {
+        var dbQuery = _context.Universities.AsNoTracking();
+
+        if (!string.IsNullOrWhiteSpace(query))
+        {
+            var searchTerm = query.Trim().ToLower();
+            dbQuery = dbQuery.Where(u =>
+                u.Name.ToLower().Contains(searchTerm) ||
+                (u.City != null && u.City.ToLower().Contains(searchTerm)));
+        }
+
+        if (!string.IsNullOrWhiteSpace(name))
+        {
+            dbQuery = dbQuery.Where(u => u.Name.ToLower().Contains(name.Trim().ToLower()));
+        }
+
+        if (!string.IsNullOrWhiteSpace(city))
+        {
+            dbQuery = dbQuery.Where(u => u.City != null && u.City.ToLower().Contains(city.Trim().ToLower()));
+        }
+
+        switch (universitySortBy)
+        {
+            case UniversitySortBy.Newest:
+            default:
+                dbQuery = sortOrder == SortOrder.Descending
+                    ? dbQuery.OrderByDescending(u => u.CreatedAt).ThenBy(u => u.Id)
+                    : dbQuery.OrderBy(u => u.CreatedAt).ThenBy(u => u.Id);
+                break;
+
+            case UniversitySortBy.Rating:
+                dbQuery = sortOrder == SortOrder.Descending
+                    ? dbQuery.OrderByDescending(u => u.Reviews.Any() ? u.Reviews.Average(e => e.Score) : 0)
+                        .ThenBy(u => u.Id)
+                    : dbQuery.OrderBy(u => u.Reviews.Any() ? u.Reviews.Average(e => e.Score) : 0)
+                        .ThenBy(u => u.Id);
+                break;
+
+            case UniversitySortBy.ReviewCount:
+                dbQuery = sortOrder == SortOrder.Descending
+                    ? dbQuery.OrderByDescending(u => u.Reviews.Any() ? u.Reviews.Count() : 0)
+                        .ThenBy(u => u.Id)
+                    : dbQuery.OrderBy(u => u.Reviews.Any() ? u.Reviews.Count() : 0)
+                        .ThenBy(u => u.Id);
+                break;
+        }
+
+        var totalCount = await dbQuery.CountAsync();
+
+        var projectedQuery = dbQuery
+            .Skip(offset)
+            .Take(limit)
+            .Select(u => new UniversityPreview
+            {
+                Id = u.Id,
+                Name = u.Name,
+                City = u.City,
+                Website = u.Website,
+                CreatedAt = u.CreatedAt,
+                AverageScore = u.Reviews.Any() ? u.Reviews.Average(e => e.Score) : 0,
+                ReviewCount = u.Reviews.Any() ? u.Reviews.Count() : 0
+            });
+
+        var items = await projectedQuery.ToListAsync();
+
+        return new OffsetPagedResult<UniversityPreview>
+        {
+            Items = items,
+            TotalCount = totalCount,
+            Offset = offset,
+            Limit = limit
+        };
+    }
+
     public async Task<Result<UniversityDetailedPreview>> FindByIdFetchDetailedPreviewAsync(Guid universityId)
     {
         var result = await _context.Universities
@@ -189,5 +274,59 @@ public class UniversityRepository : IUniversityRepository
         }
 
         return result;
+    }
+
+    public async Task<Result<University>> FindByIdAsync(Guid universityId)
+    {
+        var university = await _context.Universities.FirstOrDefaultAsync(u => u.Id == universityId);
+
+        if (university is null)
+        {
+            return Result.Failure<University>(UniversityErrors.NotFound);
+        }
+
+        return university;
+    }
+
+    public Task<Result<University>> UpdateAsync(University university)
+    {
+        _context.Universities.Update(university);
+        return Task.FromResult(Result.Success(university));
+    }
+
+    public async Task<Result> DeleteAsync(Guid universityId)
+    {
+        var university = await _context.Universities.FirstOrDefaultAsync(u => u.Id == universityId);
+
+        if (university is null)
+        {
+            return Result.Failure(UniversityErrors.NotFound);
+        }
+
+        _context.Universities.Remove(university);
+        return Result.Success();
+    }
+
+    public Task AddAsync(University university)
+    {
+        _context.Universities.Add(university);
+        return Task.CompletedTask;
+    }
+
+    public async Task<Result<University>> UpdateIconUrlAsync(Guid universityId, string iconUrl)
+    {
+        var getResult = await FindByIdAsync(universityId);
+
+        if (getResult.IsFailure)
+        {
+            return Result.Failure<University>(getResult.Error);
+        }
+
+        var university = getResult.Value;
+        university.IconUrl = iconUrl;
+
+        _context.Universities.Update(university);
+
+        return Result.Success(university);
     }
 }

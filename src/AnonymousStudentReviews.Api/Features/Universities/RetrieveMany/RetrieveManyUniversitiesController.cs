@@ -16,8 +16,8 @@ public class RetrieveManyUniversitiesController : ControllerBase
     private readonly IRetrieveManyUniversitiesService _retrieveManyUniversitiesService;
     private readonly IValidator<RetrieveManyUniversitiesQueryParameters> _validator;
 
-
-    public RetrieveManyUniversitiesController(IValidator<RetrieveManyUniversitiesQueryParameters> validator,
+    public RetrieveManyUniversitiesController(
+        IValidator<RetrieveManyUniversitiesQueryParameters> validator,
         IRetrieveManyUniversitiesService retrieveManyUniversitiesService)
     {
         _validator = validator;
@@ -27,7 +27,6 @@ public class RetrieveManyUniversitiesController : ControllerBase
     [HttpGet]
     public async Task<ActionResult<CursorPagedResult<UniversityPreview>>> RetrieveAllUniversitiesAsync(
         [FromQuery] RetrieveManyUniversitiesQueryParameters queryParameters)
-
     {
         var validationResult = await _validator.ValidateAsync(queryParameters);
 

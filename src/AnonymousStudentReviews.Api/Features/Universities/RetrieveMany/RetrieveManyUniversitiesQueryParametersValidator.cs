@@ -2,8 +2,8 @@ using FluentValidation;
 
 namespace AnonymousStudentReviews.Api.Features.Universities.RetrieveMany;
 
-public class
-    RetrieveManyUniversitiesQueryParametersValidator : AbstractValidator<RetrieveManyUniversitiesQueryParameters>
+public class RetrieveManyUniversitiesQueryParametersValidator
+    : AbstractValidator<RetrieveManyUniversitiesQueryParameters>
 {
     public RetrieveManyUniversitiesQueryParametersValidator()
     {
