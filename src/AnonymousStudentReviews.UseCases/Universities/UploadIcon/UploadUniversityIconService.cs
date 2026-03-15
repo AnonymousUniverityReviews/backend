@@ -1,26 +1,31 @@
 ﻿using AnonymousStudentReviews.Core.Abstractions;
-using AnonymousStudentReviews.Core.Aggregates.University;
 
 namespace AnonymousStudentReviews.UseCases.Universities.UploadIcon;
 
 public class UploadUniversityIconService : IUploadUniversityIconService
 {
-    private readonly IUniversityRepository _repository;
+    private static readonly string[] AllowedExtensions = [".png", ".jpg", ".jpeg", ".webp"];
 
-    public UploadUniversityIconService(IUniversityRepository repository)
+    private readonly IUniversityIconStorage _iconStorage;
+
+    public UploadUniversityIconService(IUniversityIconStorage iconStorage)
     {
-        _repository = repository;
+        _iconStorage = iconStorage;
     }
 
-    public async Task<Result<string>> ExecuteAsync(Guid universityId, string iconUrl)
+    public async Task<Result<string>> ExecuteAsync(UploadUniversityIconDto dto)
     {
-        var result = await _repository.UpdateIconUrlAsync(universityId, iconUrl);
+        var ext = Path.GetExtension(dto.FileName).ToLowerInvariant();
 
-        if (result.IsFailure)
+        if (!AllowedExtensions.Contains(ext))
         {
-            return Result.Failure<string>(result.Error);
+            return Result.Failure<string>(new Error(
+                "UniversityIcon.UnsupportedFileType",
+                "Unsupported file type. Allowed: png, jpg, jpeg, webp"));
         }
 
-        return iconUrl;
+        var iconUrl = await _iconStorage.SaveAsync(dto.FileStream, dto.FileName);
+
+        return Result.Success(iconUrl);
     }
 }
