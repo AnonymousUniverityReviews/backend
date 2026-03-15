@@ -9,6 +9,7 @@ public class CreateUniversityRequestValidator : AbstractValidator<CreateUniversi
         RuleFor(x => x.Name).NotEmpty().MaximumLength(255);
         RuleFor(x => x.City).MaximumLength(255);
         RuleFor(x => x.Website).MaximumLength(300);
+        RuleFor(x => x.IconUrl).MaximumLength(300);
         RuleFor(x => x.Description).MaximumLength(1000);
     }
 }

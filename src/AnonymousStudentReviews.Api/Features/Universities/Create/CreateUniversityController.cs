@@ -47,6 +47,7 @@ public class CreateUniversityController : ControllerBase
             Name = request.Name,
             City = request.City,
             Website = request.Website,
+            IconUrl = request.IconUrl,
             Description = request.Description
         };
 
